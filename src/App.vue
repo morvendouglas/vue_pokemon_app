@@ -1,11 +1,14 @@
 <template>
   <div id="app">
+    <pokemon-detail v-if="selectedPokemon" :pokemon="selectedPokemon"></pokemon-detail>
   <pokemon-list :allPokemon='allPokemon'></pokemon-list>
   </div>
 </template>
 
 <script>
+import PokemonDetail from './components/PokemonDetail.vue';
 import PokemonList from "./components/PokemonList.vue"
+
 import { eventBus } from './main';
 export default {
   name: 'App',
@@ -16,7 +19,15 @@ export default {
     };
   },
   components: {
+    "pokemon-detail" : PokemonDetail,
     "pokemon-list" : PokemonList
+  },
+  methods: {
+    fetchSinglePokemon: function(url){
+      return fetch(url)
+      .then((res) => res.json())
+      .then((data) => (this.selectedPokemon = data))
+    },
   },
   mounted(){
     fetch('https://pokeapi.co/api/v2/pokemon?limit=151%27')
@@ -25,7 +36,7 @@ export default {
     ;
 
     eventBus.$on('pokemon-selected', (pokemon) => {
-      this.selectedPokemon = pokemon
+        this.fetchSinglePokemon(pokemon.url)
     })
   }
 };
