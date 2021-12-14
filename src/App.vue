@@ -1,19 +1,34 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <pokemon-list :allPokemon='allPokemon'></pokemon-list>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import PokemonList from "./components/PokemonList.vue"
+import { eventBus } from './main';
 export default {
   name: 'App',
+  data(){
+    return{
+        allPokemon : [],
+        selectedPokemon : null
+    };
+  },
   components: {
-    HelloWorld
+    "pokemon-list" : PokemonList
+  },
+  mounted(){
+    fetch('https://pokeapi.co/api/v2/pokemon?limit=151%27')
+    .then((res) => res.json())
+    .then((data) => (this.allPokemon = data.results))
+    ;
+
+    eventBus.$on('pokemon-selected', (pokemon) => {
+      this.selectedPokemon = pokemon
+    })
   }
-}
+};
 </script>
 
 <style>
@@ -26,3 +41,4 @@ export default {
   margin-top: 60px;
 }
 </style>
+
